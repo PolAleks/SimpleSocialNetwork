@@ -2,9 +2,10 @@
 @using SimpleSocialNetwork.DAL.Entity;
 
 @inject SignInManager<User> SignInManager
-@inject UserManager<User> UserManager;
+@inject UserManager<User> UserManager
 
-@model SimpleSocialNetwork.BLL.ViewModels.Account.MainViewModel
+@model SimpleSocialNetwork.BLL.ViewModels.Account.MainViewModel;
+
 @{
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -24,8 +25,8 @@ else
         </div>
 
         <div class="main">
-            <partial name="Login" model="Model.LoginView" />
-            <partial name="Register" model="Model.RegisterView" />
+            <partial name="Login" model="@Model.LoginView" />
+            <partial name="Register" model="@Model.RegisterView" />
         </div>
 
     </div>
