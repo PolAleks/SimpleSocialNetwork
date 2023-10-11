@@ -11,28 +11,28 @@ namespace SimpleSocialNetwork.BLL.ViewModels.Account
     {
         [Required]
         [Display(Name = "Идентификатор пользователя")]
-        public Guid Id { get; set; }
+        public string UserId { get; set; }
 
-        [Required]
-        [Display(Name = "Имя")]
+        [Required(ErrorMessage = "Это обязательное поле")]
+        [Display(Name = "Имя", Prompt = "Введите ваше имя")]
         [DataType(DataType.Text)]
         public string FirstName { get; set; }
 
-        [Display(Name = "Отчество")]
+        [Display(Name = "Отчество", Prompt = "Введите ваше отчество")]
         [DataType(DataType.Text)]
         public string MiddleName { get; set; }
 
-        [Required]
-        [Display(Name = "Фамилия")]
+        [Required(ErrorMessage = "Это обязательное поле")]
+        [Display(Name = "Фамилия", Prompt = "Введите вашу фамилию")]
         [DataType(DataType.Text)]
         public string LastName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Это обязательное поле")]
         [Display(Name = "День рождения")]
         [DataType(DataType.Date)]
         public DateTime BirthDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Это обязательное поле")]
         [Display(Name = "Почта")]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
@@ -48,5 +48,6 @@ namespace SimpleSocialNetwork.BLL.ViewModels.Account
         [Display(Name = "Коротко о себе")]
         [DataType(DataType.Text)]
         public string About { get; set; }
+        public string UserName => Email;
     }
 }

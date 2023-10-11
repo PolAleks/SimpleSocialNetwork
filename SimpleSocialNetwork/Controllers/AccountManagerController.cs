@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using SimpleSocialNetwork.DAL.Entity;
 using System.Threading.Tasks;
 using SimpleSocialNetwork.BLL.ViewModels.Account;
+using SimpleSocialNetwork.BLL.Extentions;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace SimpleSocialNetwork.Controllers
 {
@@ -15,7 +17,7 @@ namespace SimpleSocialNetwork.Controllers
         private readonly SignInManager<User> _signInManager;
 
         public AccountManagerController(
-            SignInManager<User> signInManager, 
+            SignInManager<User> signInManager,
             UserManager<User> userManager,
             IMapper mapper)
         {
@@ -23,7 +25,7 @@ namespace SimpleSocialNetwork.Controllers
             _signInManager = signInManager;
             _mapper = mapper;
         }
-        
+
         [Route("Login")]
         [HttpGet]
         public IActionResult Login()
@@ -98,5 +100,51 @@ namespace SimpleSocialNetwork.Controllers
 
             return View("User", new UserViewModel(result.Result));
         }
+
+        /// <summary>
+        /// Обновление информации о пользователе
+        /// </summary>
+        [Authorize]
+        [Route("Update")]
+        [HttpPost]
+        public async Task<IActionResult> Update(UserEditViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.UserId);
+
+                user.Convert(model);
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("MyPage", "AccountManager");
+                }
+                else
+                {
+                    return RedirectToAction("Edit", "AccountManager");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Некорректные данные");
+                return View("Edit", model);
+            }
+        }
+
+        [Route("Edit")]
+        [HttpGet]
+        public async Task<IActionResult> Edit()
+        {
+            // Получаем удостоверения ClaimsPrincipal текущего пользователя
+            ClaimsPrincipal claimsCurrentUser = User;
+
+            // Вытягиваем из БД пользователя 
+            Task<User> user = _userManager.GetUserAsync(claimsCurrentUser);
+
+            return View("Edit", _mapper.Map<UserEditViewModel>(user.Result));
+        }
+
+
     }
 }

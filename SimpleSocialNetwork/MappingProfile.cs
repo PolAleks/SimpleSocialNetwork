@@ -14,6 +14,9 @@ namespace SimpleSocialNetwork
                 .ForMember(u => u.Email, opt => opt.MapFrom(c => c.EmailReg))
                 .ForMember(u => u.UserName, opt => opt.MapFrom(c => c.Login));
             CreateMap<LoginViewModel, User>();
+            CreateMap<UserEditViewModel, User>();
+            CreateMap<User, UserEditViewModel>()
+                .ForMember(uedm => uedm.UserId, opt => opt.MapFrom(c => c.Id));
         }
     }
 }
