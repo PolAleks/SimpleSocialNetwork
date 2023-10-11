@@ -18,8 +18,4 @@
     <ProjectReference Include="..\SimpleSocialNetwork.DAL\SimpleSocialNetwork.DAL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\AccountManager\" />
-  </ItemGroup>
-
 </Project>

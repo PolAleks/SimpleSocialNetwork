@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SimpleSocialNetwork.DAL.Entity;
 using System.Threading.Tasks;
 using SimpleSocialNetwork.BLL.ViewModels.Account;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SimpleSocialNetwork.Controllers
 {
@@ -37,7 +38,9 @@ namespace SimpleSocialNetwork.Controllers
             return View(new LoginViewModel { ReturnUrl = returnUrl });
         }
 
-
+        /// <summary>
+        /// Метод аутентификации
+        /// </summary>
         [Route("Login")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -57,7 +60,7 @@ namespace SimpleSocialNetwork.Controllers
                         }
                         else
                         {
-                            return RedirectToAction("Index", "Home");
+                            return RedirectToAction("MyPage", "AccountManager");
                         }
                     }
                 }
@@ -69,6 +72,9 @@ namespace SimpleSocialNetwork.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        /// <summary>
+        /// Выход из аккаунта
+        /// </summary>
         [Route("Logout")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -76,6 +82,21 @@ namespace SimpleSocialNetwork.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        /// <summary>
+        /// Страница с информацией о пользователи
+        /// </summary>
+        [Authorize]
+        [HttpGet]
+        [Route("PersonalPage")]
+        public async Task<IActionResult> MyPage()
+        {
+            var user = User;
+
+            var result = _userManager.GetUserAsync(user);
+
+            return View("User", new UserViewModel(result.Result));
         }
     }
 }
