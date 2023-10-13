@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace SimpleSocialNetwork.Controllers
 {
@@ -159,7 +160,7 @@ namespace SimpleSocialNetwork.Controllers
         {
             var model = new SearchViewModel
             {
-                UserList = _userManager.Users.AsEnumerable().Where(u => u.GetFullName().Contains(search)).ToList()
+                UserList = _userManager.Users.AsEnumerable().Where(u => u.GetFullName().Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList()
             };
             return View("UserList", model);
         }
