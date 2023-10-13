@@ -151,18 +151,15 @@ namespace SimpleSocialNetwork.Controllers
 
         [Route("Edit")]
         [HttpGet]
-        public IActionResult Edit()
+        public async Task<IActionResult> Edit()
         {
             // Получаем удостоверения ClaimsPrincipal текущего пользователя
             ClaimsPrincipal claimsCurrentUser = User;
 
             // Вытягиваем из БД пользователя 
-            var user = _userManager.GetUserAsync(claimsCurrentUser);
+            var user = await _userManager.GetUserAsync(claimsCurrentUser);
 
-            var model = _mapper.Map<UserEditViewModel>(user.Result);
-
-            return View("Edit", model);
-
+            return View("Edit", _mapper.Map<UserEditViewModel>(user));
         }
 
         /// <summary>
