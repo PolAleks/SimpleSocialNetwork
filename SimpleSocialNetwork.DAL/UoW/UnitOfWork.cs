@@ -11,7 +11,7 @@ namespace SimpleSocialNetwork.DAL.UoW
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private ApplicationDbContext _appContext;
+        private readonly ApplicationDbContext _appContext;
 
         private Dictionary<Type, object> _repositories;
 
@@ -27,10 +27,7 @@ namespace SimpleSocialNetwork.DAL.UoW
 
         public IRepository<TEntity> GetRepository<TEntity>(bool hasCustomRepository = true) where TEntity : class
         {
-            if (_repositories == null)
-            {
-                _repositories = new Dictionary<Type, object>();
-            }
+            _repositories ??= new Dictionary<Type, object>();
 
             if (hasCustomRepository)
             {

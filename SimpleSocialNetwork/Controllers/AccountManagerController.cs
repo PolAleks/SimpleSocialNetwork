@@ -18,7 +18,7 @@ namespace SimpleSocialNetwork.Controllers
 {
     public class AccountManagerController : Controller
     {
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IUnitOfWork _unitOfWork;
@@ -153,10 +153,10 @@ namespace SimpleSocialNetwork.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit()
         {
-            // Получаем удостоверения ClaimsPrincipal текущего пользователя
+            // Получаем набор утверждений ClaimsPrincipal текущего пользователя
             ClaimsPrincipal claimsCurrentUser = User;
 
-            // Вытягиваем из БД пользователя 
+            // Ищем пользователя по набору утверждений Claims в БД 
             var user = await _userManager.GetUserAsync(claimsCurrentUser);
 
             return View("Edit", _mapper.Map<UserEditViewModel>(user));
@@ -174,9 +174,13 @@ namespace SimpleSocialNetwork.Controllers
             return View("UserList", model);
         }
 
+        /// <summary>
+        /// Метод для поиска пользователей по поисковому запросу
+        /// </summary>
+        /// <returns>Возвращает SearchViewModel</returns>
         private async Task<SearchViewModel> CreateSearch(string search)
         {
-            // Считываем ClaimsPrincipal ассоциированного с этим методом 
+            // Считываем утверждения ClaimsPrincipal для пользователя ассоциированного с этим методом 
             var currentUser = User;
 
             // На осноавании ClaimPrincipal получаем пользователя
@@ -188,18 +192,18 @@ namespace SimpleSocialNetwork.Controllers
             // Получаем список друзей текущего пользователя
             var withFriend = GetAllFriend(user);
 
-            // Инициализируем список пользователей с друзьями
+            // Инициализируем предстваление для отображения друзей
             var data = new List<UserWithFriendExt>();
 
             // Для каждого пользователя из списка запроса поисковой строки
-            listUserSearch.ForEach(x =>
+            listUserSearch.ForEach(searchUser =>
             {
                 // Получаем модель представление UserWithFriendExt - на базе User
-                UserWithFriendExt t = _mapper.Map<UserWithFriendExt>(x);
+                UserWithFriendExt userWithFriend = _mapper.Map<UserWithFriendExt>(searchUser);
                 // Ставим флаг друг текущему пользователю или нет
-                t.IsFriendWithCurrent = withFriend.Where(y => y.Id == x.Id || x.Id == user.Id).Count() != 0;
+                userWithFriend.IsFriendWithCurrent = withFriend.Where(y => y.Id == searchUser.Id || searchUser.Id == user.Id).Any();
 
-                data.Add(t);
+                data.Add(userWithFriend);
             });
 
             var model = new SearchViewModel()
@@ -210,16 +214,36 @@ namespace SimpleSocialNetwork.Controllers
             return model;
         }
 
+        /// <summary>
+        /// Метод для получения списка друзей
+        /// </summary>
         private List<User> GetAllFriend(User user)
         {
-            //var user = User;
-
-            //var result = await _userManager.GetUserAsync(user);
-
             // Получаем репозиторий с друзьями
             FriendsRepository repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
 
             return repository.GetFriendsByUser(user);
+        }
+
+        /// <summary>
+        /// Метод добавления друзей
+        /// </summary>
+        /// <param name="id">Идентификатор друга</param>
+        [HttpPost]
+        [Route("AddFriend")]
+        public async Task<IActionResult> AddFriend(string id)
+        {
+            var currentClaimsUser = User;
+
+            var currentUser = await _userManager.GetUserAsync(currentClaimsUser);
+
+            var friend = await _userManager.FindByIdAsync(id);
+
+            FriendsRepository repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+            await repository.AddFriend(currentUser, friend);
+
+            return RedirectToAction("MyPage", "AccountManager");
         }
 
     }

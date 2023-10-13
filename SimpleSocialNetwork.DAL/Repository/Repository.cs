@@ -34,7 +34,7 @@ namespace SimpleSocialNetwork.DAL.Repository
         public async Task Delete(TEntity item)
         {
             Set.Remove(item);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
         public async Task<TEntity> Get(int id)
