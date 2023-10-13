@@ -16,7 +16,7 @@ namespace SimpleSocialNetwork.DAL.Repository
 
         }
 
-        public void AddFriend(User target, User Friend)
+        public async Task AddFriend(User target, User Friend)
         {
             var friends = Set.AsEnumerable().FirstOrDefault(x => x.UserId == target.Id && x.CurrentFriendId == Friend.Id);
 
@@ -30,7 +30,7 @@ namespace SimpleSocialNetwork.DAL.Repository
                     CurrentFriendId = Friend.Id,
                 };
 
-                Create(item);
+                await Create(item);
             }
         }
 
@@ -41,13 +41,13 @@ namespace SimpleSocialNetwork.DAL.Repository
             return friends.ToList();
         }
 
-        public void DeleteFriend(User target, User Friend)
+        public async Task DeleteFriend(User target, User Friend)
         {
             var friends = Set.AsEnumerable().FirstOrDefault(x => x.UserId == target.Id && x.CurrentFriendId == Friend.Id);
 
             if (friends != null)
             {
-                Delete(friends);
+                await Delete(friends);
             }
         }
 

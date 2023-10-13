@@ -9,10 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SimpleSocialNetwork.DAL.Db;
 using SimpleSocialNetwork.DAL.Entity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using SimpleSocialNetwork.DAL.Repository;
+using SimpleSocialNetwork.BLL.Extentions;
 
 namespace SimpleSocialNetwork
 {
@@ -32,6 +30,8 @@ namespace SimpleSocialNetwork
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services
                 .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection))
+                .AddUnitOfWork()
+                .AddCustomRepository<Friend, FriendsRepository>()
                 .AddIdentity<User, IdentityRole>(options =>
                 {
                     options.Password.RequiredLength = 5;
