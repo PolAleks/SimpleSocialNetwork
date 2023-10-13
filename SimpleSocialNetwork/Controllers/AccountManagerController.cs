@@ -246,5 +246,21 @@ namespace SimpleSocialNetwork.Controllers
             return RedirectToAction("MyPage", "AccountManager");
         }
 
+        [HttpPost]
+        [Route("DeleteFriend")]
+        public async Task<IActionResult> DeleteFriend(string id)
+        {
+            var currentClaimsUser = User;
+
+            var currentUser = await _userManager.GetUserAsync(currentClaimsUser);
+
+            var friend = await _userManager.FindByIdAsync(id);
+
+            FriendsRepository repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+            await repository.DeleteFriend(currentUser, friend);
+
+            return RedirectToAction("MyPage", "AccountManager");
+        }
     }
 }
