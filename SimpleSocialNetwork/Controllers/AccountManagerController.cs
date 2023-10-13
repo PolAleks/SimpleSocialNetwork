@@ -7,6 +7,8 @@ using SimpleSocialNetwork.BLL.ViewModels.Account;
 using SimpleSocialNetwork.BLL.Extentions;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace SimpleSocialNetwork.Controllers
 {
@@ -132,6 +134,9 @@ namespace SimpleSocialNetwork.Controllers
             }
         }
 
+        /// <summary>
+        /// Метод для редактирования данных пользователя
+        /// </summary>
         [Route("Edit")]
         [HttpGet]
         public async Task<IActionResult> Edit()
@@ -145,6 +150,19 @@ namespace SimpleSocialNetwork.Controllers
             return View("Edit", _mapper.Map<UserEditViewModel>(user.Result));
         }
 
+        /// <summary>
+        /// Метод для вывода результата поиска пользователей
+        /// </summary>
+        [Route("UserList")]
+        [HttpPost]
+        public IActionResult UserList(string search)
+        {
+            var model = new SearchViewModel
+            {
+                UserList = _userManager.Users.AsEnumerable().Where(u => u.GetFullName().Contains(search)).ToList()
+            };
+            return View("UserList", model);
+        }
 
     }
 }
