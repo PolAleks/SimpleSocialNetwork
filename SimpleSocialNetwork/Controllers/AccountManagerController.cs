@@ -10,6 +10,9 @@ using System.Security.Claims;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System;
+using SimpleSocialNetwork.DAL.Repository;
+using System.Collections.Generic;
+using SimpleSocialNetwork.DAL.UoW;
 
 namespace SimpleSocialNetwork.Controllers
 {
@@ -18,15 +21,18 @@ namespace SimpleSocialNetwork.Controllers
         private IMapper _mapper;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IUnitOfWork _unitOfWork;
 
         public AccountManagerController(
             SignInManager<User> signInManager,
             UserManager<User> userManager,
-            IMapper mapper)
+            IMapper mapper,
+            IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         [Route("Login")]
@@ -99,9 +105,13 @@ namespace SimpleSocialNetwork.Controllers
         {
             var user = User;
 
-            var result = _userManager.GetUserAsync(user);
+            var result = await _userManager.GetUserAsync(user);
 
-            return View("User", new UserViewModel(result.Result));
+            var model = new UserViewModel(result);
+
+            model.Friends = GetAllFriend(model.User);
+
+            return View("User", model);
         }
 
         /// <summary>
@@ -140,15 +150,18 @@ namespace SimpleSocialNetwork.Controllers
         /// </summary>
         [Route("Edit")]
         [HttpGet]
-        public async Task<IActionResult> Edit()
+        public IActionResult Edit()
         {
             // Получаем удостоверения ClaimsPrincipal текущего пользователя
             ClaimsPrincipal claimsCurrentUser = User;
 
             // Вытягиваем из БД пользователя 
-            Task<User> user = _userManager.GetUserAsync(claimsCurrentUser);
+            var user = _userManager.GetUserAsync(claimsCurrentUser);
 
-            return View("Edit", _mapper.Map<UserEditViewModel>(user.Result));
+            var model = _mapper.Map<UserEditViewModel>(user.Result);
+
+            return View("Edit", model);
+
         }
 
         /// <summary>
@@ -156,13 +169,59 @@ namespace SimpleSocialNetwork.Controllers
         /// </summary>
         [Route("UserList")]
         [HttpPost]
-        public IActionResult UserList(string search)
+        public async Task<IActionResult> UserList(string search)
         {
-            var model = new SearchViewModel
-            {
-                UserList = _userManager.Users.AsEnumerable().Where(u => u.GetFullName().Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList()
-            };
+            SearchViewModel model = await CreateSearch(search);
+
             return View("UserList", model);
+        }
+
+        private async Task<SearchViewModel> CreateSearch(string search)
+        {
+            // Считываем ClaimsPrincipal ассоциированного с этим методом 
+            var currentUser = User;
+
+            // На осноавании ClaimPrincipal получаем пользователя
+            User user = await _userManager.GetUserAsync(currentUser);
+
+            // Получаем список пользователей на основании запроса из поисковой строки
+            List<User> listUserSearch = _userManager.Users.AsEnumerable().Where(u => u.GetFullName().Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList();
+
+            // Получаем список друзей текущего пользователя
+            var withFriend = GetAllFriend(user);
+
+            // Инициализируем список пользователей с друзьями
+            var data = new List<UserWithFriendExt>();
+
+            // Для каждого пользователя из списка запроса поисковой строки
+            listUserSearch.ForEach(x =>
+            {
+                // Получаем модель представление UserWithFriendExt - на базе User
+                UserWithFriendExt t = _mapper.Map<UserWithFriendExt>(x);
+                // Ставим флаг друг текущему пользователю или нет
+                t.IsFriendWithCurrent = withFriend.Where(y => y.Id == x.Id || x.Id == user.Id).Count() != 0;
+
+                data.Add(t);
+            });
+
+            var model = new SearchViewModel()
+            {
+                UserList = data
+            };
+
+            return model;
+        }
+
+        private List<User> GetAllFriend(User user)
+        {
+            //var user = User;
+
+            //var result = await _userManager.GetUserAsync(user);
+
+            // Получаем репозиторий с друзьями
+            FriendsRepository repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+            return repository.GetFriendsByUser(user);
         }
 
     }

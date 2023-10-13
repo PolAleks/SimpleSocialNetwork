@@ -14,5 +14,6 @@ namespace SimpleSocialNetwork.BLL.ViewModels.Account
         {
             this.User = user;
         }
+        public List<User> Friends { get; set; }
     }
 }
