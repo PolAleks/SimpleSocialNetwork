@@ -1,12 +1,17 @@
 ﻿@model SimpleSocialNetwork.BLL.ViewModels.Account.SearchViewModel
 
 <div class="block-reg background-white">
-
-    @foreach (var user in @Model.UserList)
+    @if (Model.UserList.Any())
     {
-        <div>
-            <label>@user.GetFullName()</label>
-        </div>
+        @foreach (var user in @Model.UserList)
+        {
+            <div>
+                <label>@user.GetFullName()</label>
+            </div>
+        }
     }
-
+    else
+    {
+        <label>Поиск не дал результатов!</label>
+    }
 </div>
