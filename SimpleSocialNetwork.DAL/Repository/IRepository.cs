@@ -12,6 +12,6 @@ namespace SimpleSocialNetwork.DAL.Repository
         T Get(int id);
         void Create(T item);
         void Update(T item);
-        void Delete(int id);
+        void Delete(T item);
     }
 }

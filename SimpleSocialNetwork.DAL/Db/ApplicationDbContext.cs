@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SimpleSocialNetwork.DAL.Configuration;
 using SimpleSocialNetwork.DAL.Entity;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,13 @@ namespace SimpleSocialNetwork.DAL.Db
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
             Database.Migrate();
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.ApplyConfiguration<Friend>(new FriendConfiguration());
         }
     }
 }
