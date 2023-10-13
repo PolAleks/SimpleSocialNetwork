@@ -21,7 +21,7 @@ namespace SimpleSocialNetwork
                 .ForMember(x => x.UserId, opt => opt.MapFrom(c => c.Id));
 
             CreateMap<UserWithFriendExt, User>();
-            CreateMap<User, UserEditViewModel>();
+            CreateMap<User, UserWithFriendExt>();
         }
     }
 }

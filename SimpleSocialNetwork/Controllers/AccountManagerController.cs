@@ -148,6 +148,7 @@ namespace SimpleSocialNetwork.Controllers
         /// <summary>
         /// Метод для редактирования данных пользователя
         /// </summary>
+
         [Route("Edit")]
         [HttpGet]
         public IActionResult Edit()
