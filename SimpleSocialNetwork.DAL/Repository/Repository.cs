@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using SimpleSocialNetwork.DAL.Db;
 using System;
 using System.Collections.Generic;
@@ -21,38 +22,35 @@ namespace SimpleSocialNetwork.DAL.Repository
         public Repository(ApplicationDbContext db)
         {
             _db = db;
-            var set = _db.Set<TEntity>();
-            set.Load();
-
-            Set = set;
+            Set = _db.Set<TEntity>();
         }
 
-        public void Create(TEntity item)
+        public async Task Create(TEntity item)
         {
-            Set.Add(item);
-            _db.SaveChanges();
+            await Set.AddAsync(item);
+            await _db.SaveChangesAsync();
         }
 
-        public void Delete(TEntity item)
+        public async Task Delete(TEntity item)
         {
             Set.Remove(item);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
-        public TEntity Get(int id)
+        public async Task<TEntity> Get(int id)
         {
-            return Set.Find(id);
+            return await Set.FindAsync(id);
         }
 
-        public IEnumerable<TEntity> GetAll()
+        public async Task<List<TEntity>> GetAll()
         {
-            return Set;
+            return await Set.ToListAsync();
         }
 
-        public void Update(TEntity item)
+        public async Task Update(TEntity item)
         {
             Set.Update(item);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
     }
 }
