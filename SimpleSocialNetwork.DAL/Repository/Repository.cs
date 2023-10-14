@@ -16,7 +16,7 @@ namespace SimpleSocialNetwork.DAL.Repository
         public DbSet<TEntity> Set
         {
             get;
-            private set;
+            set;
         }
 
         public Repository(ApplicationDbContext db)

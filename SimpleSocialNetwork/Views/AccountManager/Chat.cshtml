@@ -1,5 +1,54 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model SimpleSocialNetwork.BLL.ViewModels.Account.ChatViewModel
+
+<meta http-equiv="refresh" content="10">
+<partial name="_ValidationScriptsPartial" />
+
+<div class="block-reg background-white">
+    <div>
+        <form method="get" asp-controller="AccountManager" asp-action="MyPage">
+            <input class="enter_submit" type="submit" value="Назад" />
+        </form>
+    </div>
+
+    <h4 class="center">Чат @Model.You.FirstName и  @Model.ToWhom.FirstName</h4>
+
+    <div class="lined-block">
+        <label class="gray-text">Сообщения</label>
+
+        @if (Model.History.Any())
+        {
+
+            @foreach (var message in @Model.History)
+            {
+                <div>
+                    <label> @message.Sender.FirstName:</label>
+                    @message.Text
+                </div>
+            }
+        }
+        else
+        {
+            <div>
+                <label> У вас пока нет сообщений с  @Model.ToWhom.GetFullName().</label>
+            </div>
+        }
+
+
+    </div>
+
+    <div class="lined-block">
+        <label class="gray-text">Новое сообщение</label>
+
+        <form class="frm" method="post" asp-controller="AccountManager" asp-action="NewMessage" asp-route-id="@Model.ToWhom.Id">
+            <div asp-validation-summary="ModelOnly"></div>
+            <div>
+                <div class="mrgn">
+                    <input asp-for="NewMessage.Text" class="form-control emojify" type="text" />
+                </div>
+                <div class="center">
+                    <input class="btn_submit" type="submit" value="Отправить" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

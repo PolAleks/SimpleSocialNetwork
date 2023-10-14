@@ -32,6 +32,7 @@ namespace SimpleSocialNetwork
                 .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection))
                 .AddUnitOfWork()
                 .AddCustomRepository<Friend, FriendsRepository>()
+                .AddCustomRepository<Message, MessageRepository>()
                 .AddIdentity<User, IdentityRole>(options =>
                 {
                     options.Password.RequiredLength = 5;
