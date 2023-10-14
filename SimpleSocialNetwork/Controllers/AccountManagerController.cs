@@ -256,6 +256,9 @@ namespace SimpleSocialNetwork.Controllers
             return RedirectToAction("MyPage", "AccountManager");
         }
 
+        /// <summary>
+        /// Метод удаления из друзей
+        /// </summary>
         [HttpPost]
         [Route("DeleteFriend")]
         public async Task<IActionResult> DeleteFriend(string id)
@@ -271,6 +274,64 @@ namespace SimpleSocialNetwork.Controllers
             await repository.DeleteFriend(currentUser, friend);
 
             return RedirectToAction("MyPage", "AccountManager");
+        }
+
+        /// <summary>
+        /// Метод отображения чата
+        /// </summary>
+        [Route("Chat")]
+        [HttpPost]
+        public async Task<IActionResult> Chat(string id)
+        {
+            var currentuser = User;
+
+            var result = await _userManager.GetUserAsync(currentuser);
+            var friend = await _userManager.FindByIdAsync(id);
+
+            var repository = _unitOfWork.GetRepository<Message>() as MessageRepository;
+
+            var mess = repository.GetMessages(result, friend);
+
+            var model = new ChatViewModel()
+            {
+                You = result,
+                ToWhom = friend,
+                History = mess.OrderBy(x => x.Id).ToList(),
+            };
+            return View("Chat", model);
+        }
+
+        /// <summary>
+        /// Метод отправки сообщения
+        /// </summary>
+        [Route("NewMessage")]
+        [HttpPost]
+        public async Task<IActionResult> NewMessage(string id, ChatViewModel chat)
+        {
+            var currentuser = User;
+
+            var result = await _userManager.GetUserAsync(currentuser);
+            var friend = await _userManager.FindByIdAsync(id);
+
+            var repository = _unitOfWork.GetRepository<Message>() as MessageRepository;
+
+            var item = new Message()
+            {
+                Sender = result,
+                Recipient = friend,
+                Text = chat.NewMessage.Text,
+            };
+            await repository.Create(item);
+
+            var mess = repository.GetMessages(result, friend);
+
+            var model = new ChatViewModel()
+            {
+                You = result,
+                ToWhom = friend,
+                History = mess.OrderBy(x => x.Id).ToList(),
+            };
+            return View("Chat", model);
         }
     }
 }
