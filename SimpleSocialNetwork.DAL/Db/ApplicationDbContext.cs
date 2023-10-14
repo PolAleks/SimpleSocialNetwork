@@ -22,6 +22,7 @@ namespace SimpleSocialNetwork.DAL.Db
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new FriendConfiguration());
+            builder.ApplyConfiguration(new MessageConfiguration());
         }
     }
 }
