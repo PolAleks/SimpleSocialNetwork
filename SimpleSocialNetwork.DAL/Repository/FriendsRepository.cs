@@ -36,7 +36,8 @@ namespace SimpleSocialNetwork.DAL.Repository
 
         public List<User> GetFriendsByUser(User target)
         {
-            var friends = Set.Include(x => x.CurrentFriend).AsEnumerable().Where(x => x.User.Id == target.Id).Select(x => x.CurrentFriend);
+            // Set - это таблица UserFriends
+            var friends = Set.Include(x => x.CurrentFriend).Where(x => x.User.Id == target.Id).Select(x => x.CurrentFriend);
 
             return friends.ToList();
         }

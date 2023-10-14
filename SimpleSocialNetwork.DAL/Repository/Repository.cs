@@ -11,7 +11,7 @@ namespace SimpleSocialNetwork.DAL.Repository
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        protected DbContext _db;
+        public DbContext _db;
 
         public DbSet<TEntity> Set
         {
@@ -19,13 +19,10 @@ namespace SimpleSocialNetwork.DAL.Repository
             set;
         }
 
-        public Repository(ApplicationDbContext db)
+        public Repository(DbContext db)
         {
-            _db = db;
-            var set = _db.Set<TEntity>();
-            set.Load();
-
-            Set = set;
+            _db = db ?? throw new ArgumentNullException(nameof(db));
+            Set = db.Set<TEntity>();
         }
 
         public async Task Create(TEntity item)

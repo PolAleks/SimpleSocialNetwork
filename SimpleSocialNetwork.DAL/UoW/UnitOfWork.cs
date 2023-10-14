@@ -17,12 +17,12 @@ namespace SimpleSocialNetwork.DAL.UoW
 
         public UnitOfWork(ApplicationDbContext app)
         {
-            this._appContext = app;
+            _appContext = app;
         }
 
         public void Dispose()
         {
-
+            GC.SuppressFinalize(this);
         }
 
         public IRepository<TEntity> GetRepository<TEntity>(bool hasCustomRepository = true) where TEntity : class
