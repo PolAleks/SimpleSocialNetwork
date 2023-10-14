@@ -186,9 +186,13 @@ namespace SimpleSocialNetwork.Controllers
             // На осноавании ClaimPrincipal получаем пользователя
             User user = await _userManager.GetUserAsync(currentUser);
 
-            // Получаем список пользователей на основании запроса из поисковой строки
-            List<User> listUserSearch = _userManager.Users.AsEnumerable().Where(u => u.GetFullName().Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList();
+            List<User> listUserSearch = _userManager.Users.ToList();
 
+            if (!string.IsNullOrEmpty(search))
+            {
+                // Получаем список пользователей на основании запроса из поисковой строки
+                listUserSearch = _userManager.Users.AsEnumerable().Where(u => u.GetFullName().Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList();
+            } 
             // Получаем список друзей текущего пользователя
             var withFriend = await GetAllFriend();
 

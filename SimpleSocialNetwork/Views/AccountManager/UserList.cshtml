@@ -6,15 +6,29 @@
         @foreach (var user in @Model.UserList)
         {
             <div>
-                <label>@user.GetFullName()</label>
-                @if (!@user.IsFriendWithCurrent)
-                {
-                    <form asp-controller="AccountManager" asp-action="AddFriend" asp-route-id="@user.Id" method="post">
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            Добавить в друзья
-                        </button>
-                    </form>
-                }
+
+                <div class="mrgn center-align">
+                    <img src="@user.Image" class="avatar" />
+                </div>
+                <div class="mrgn center-align">
+                    <label>@user.GetFullName()</label>
+                </div>
+                <div class="mrgn center-align">
+                    <label>@user.Status</label>
+                </div>
+                <div class="mrgn center-align">
+                    <label>@user.About</label>
+                </div>
+                <div class="mrgn center-align">
+                    @if (!@user.IsFriendWithCurrent)
+                    {
+                        <form asp-controller="AccountManager" asp-action="AddFriend" asp-route-id="@user.Id" method="post">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                Добавить в друзья
+                            </button>
+                        </form>
+                    }
+                </div>
             </div>
         }
     }

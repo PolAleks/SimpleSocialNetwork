@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleSocialNetwork.BLL.ViewModels.Account;
+using SimpleSocialNetwork.DAL.Db;
 using SimpleSocialNetwork.DAL.Entity;
 using SimpleSocialNetwork.Models;
 using System;
@@ -17,11 +18,13 @@ namespace SimpleSocialNetwork.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, SignInManager<User> signInManager)
+        public HomeController(ILogger<HomeController> logger, SignInManager<User> signInManager, UserManager<User> userManager)
         {
             _logger = logger;
             _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         [Route("")]
@@ -33,6 +36,25 @@ namespace SimpleSocialNetwork.Controllers
                 return RedirectToAction("MyPage", "AccountManager");
             }
             return View(new MainViewModel());
+        }
+
+        [Route("Generate")]
+        [HttpGet]
+        public async Task<IActionResult> Generate()
+        {
+
+            var usergen = new GenetateUsers();
+            var userlist = usergen.Populate(35);
+
+            foreach (var user in userlist)
+            {
+                var result = await _userManager.CreateAsync(user, "123456");
+
+                if (!result.Succeeded)
+                    continue;
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
         [Route("[action]")]
