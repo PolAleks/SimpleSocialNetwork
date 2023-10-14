@@ -16,10 +16,10 @@ namespace SimpleSocialNetwork.DAL.Repository
         public DbSet<TEntity> Set
         {
             get;
-            set;
+            private set;
         }
 
-        public Repository(DbContext db)
+        public Repository(ApplicationDbContext db)
         {
             _db = db ?? throw new ArgumentNullException(nameof(db));
             Set = db.Set<TEntity>();
