@@ -22,7 +22,10 @@ namespace SimpleSocialNetwork.DAL.Repository
         public Repository(ApplicationDbContext db)
         {
             _db = db;
-            Set = _db.Set<TEntity>();
+            var set = _db.Set<TEntity>();
+            set.Load();
+
+            Set = set;
         }
 
         public async Task Create(TEntity item)

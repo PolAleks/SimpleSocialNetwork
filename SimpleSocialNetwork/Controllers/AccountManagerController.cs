@@ -109,7 +109,7 @@ namespace SimpleSocialNetwork.Controllers
 
             var model = new UserViewModel(result);
 
-            model.Friends = GetAllFriend(model.User);
+            model.Friends = await GetAllFriend(model.User);
 
             return View("User", model);
         }
@@ -190,7 +190,7 @@ namespace SimpleSocialNetwork.Controllers
             List<User> listUserSearch = _userManager.Users.AsEnumerable().Where(u => u.GetFullName().Contains(search, StringComparison.CurrentCultureIgnoreCase)).ToList();
 
             // Получаем список друзей текущего пользователя
-            var withFriend = GetAllFriend(user);
+            var withFriend = await GetAllFriend();
 
             // Инициализируем предстваление для отображения друзей
             var data = new List<UserWithFriendExt>();
@@ -217,12 +217,22 @@ namespace SimpleSocialNetwork.Controllers
         /// <summary>
         /// Метод для получения списка друзей
         /// </summary>
-        private List<User> GetAllFriend(User user)
+        private async Task<List<User>> GetAllFriend(User user)
         {
-            // Получаем репозиторий с друзьями
-            FriendsRepository repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+            var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
 
             return repository.GetFriendsByUser(user);
+        }
+
+        private async Task<List<User>> GetAllFriend()
+        {
+            var user = User;
+
+            var result = await _userManager.GetUserAsync(user);
+
+            var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+            return repository.GetFriendsByUser(result);
         }
 
         /// <summary>

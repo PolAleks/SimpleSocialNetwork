@@ -10,7 +10,7 @@ using SimpleSocialNetwork.DAL.Db;
 namespace SimpleSocialNetwork.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231011133659_init")]
+    [Migration("20231014083254_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -152,6 +152,30 @@ namespace SimpleSocialNetwork.DAL.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("SimpleSocialNetwork.DAL.Entity.Friend", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CurrentFriendId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrentFriendId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserFriends");
+                });
+
             modelBuilder.Entity("SimpleSocialNetwork.DAL.Entity.User", b =>
                 {
                     b.Property<string>("Id")
@@ -287,6 +311,21 @@ namespace SimpleSocialNetwork.DAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SimpleSocialNetwork.DAL.Entity.Friend", b =>
+                {
+                    b.HasOne("SimpleSocialNetwork.DAL.Entity.User", "CurrentFriend")
+                        .WithMany()
+                        .HasForeignKey("CurrentFriendId");
+
+                    b.HasOne("SimpleSocialNetwork.DAL.Entity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("CurrentFriend");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
